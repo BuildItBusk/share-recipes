@@ -34,8 +34,8 @@ export async function POST(request: NextRequest) {
     const result = await openai.responses.create({
       model: 'gpt-5-nano',
       input: fullPrompt,
-      reasoning: { effort: 'medium' },
-      text: { verbosity: 'medium' },
+      reasoning: { effort: 'minimal' },
+      text: { verbosity: 'low' },
     });
 
     const formattedRecipe = result.output_text;

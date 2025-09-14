@@ -1,9 +1,60 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useRecipe } from './RecipeContext';
 
 export default function FormattedRecipe() {
-  const { formattedRecipe, setActiveTab } = useRecipe();
+  const { originalRecipe, formattedRecipe, setActiveTab } = useRecipe();
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
+  const router = useRouter();
+
+  const handleSaveAndShare = async () => {
+    if (!originalRecipe || !formattedRecipe) return;
+
+    setIsSaving(true);
+    try {
+      const response = await fetch('/api/save-recipe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          rawText: originalRecipe,
+          formattedText: formattedRecipe,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to save recipe');
+      }
+
+      // Redirect to the shared recipe page
+      router.push(data.shareUrl);
+    } catch (error) {
+      console.error('Error saving recipe:', error);
+      alert('Failed to save recipe. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const copyToClipboard = async () => {
+    if (!shareUrl) return;
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy to clipboard:', error);
+      alert('Failed to copy to clipboard');
+    }
+  };
 
   if (!formattedRecipe) {
     return (
@@ -26,15 +77,47 @@ export default function FormattedRecipe() {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <h2 className="text-xl font-semibold text-white">Formatted Recipe</h2>
-        <button
-          onClick={() => setActiveTab('paste')}
-          className="text-sm text-gray-400 hover:text-white transition-colors"
-        >
-          Format Another Recipe
-        </button>
+        <div>
+          {!shareUrl ? (
+            <button
+              onClick={handleSaveAndShare}
+              disabled={isSaving}
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors text-sm whitespace-nowrap"
+            >
+              {isSaving ? 'Saving...' : 'Save & Share'}
+            </button>
+          ) : (
+            <button
+              onClick={copyToClipboard}
+              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors text-sm whitespace-nowrap"
+            >
+              {copySuccess ? 'Copied!' : 'Copy Share Link'}
+            </button>
+          )}
+        </div>
       </div>
+
+      {shareUrl && (
+        <div className="bg-green-900 border border-green-700 p-3 rounded-md">
+          <p className="text-green-300 text-sm mb-2">Recipe saved! Share this link:</p>
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={shareUrl}
+              readOnly
+              className="flex-1 bg-green-800 text-green-100 p-2 rounded text-sm"
+            />
+            <button
+              onClick={copyToClipboard}
+              className="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 transition-colors text-sm"
+            >
+              {copySuccess ? 'Copied!' : 'Copy'}
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="bg-gray-900 border border-gray-600 rounded-md p-6">
         <div

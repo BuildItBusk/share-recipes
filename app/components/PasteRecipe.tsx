@@ -6,6 +6,7 @@ import { useRecipe } from './RecipeContext';
 export default function PasteRecipe() {
   const [recipeText, setRecipeText] = useState('');
   const {
+    setOriginalRecipe,
     setFormattedRecipe,
     setActiveTab,
     isLoading,
@@ -38,6 +39,7 @@ export default function PasteRecipe() {
         throw new Error(data.error || 'Failed to format recipe');
       }
 
+      setOriginalRecipe(recipeText);
       setFormattedRecipe(data.formattedRecipe);
       setActiveTab('formatted');
     } catch (err) {
