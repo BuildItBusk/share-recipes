@@ -10,6 +10,30 @@ This is a Next.js 15 application for sharing recipes, bootstrapped with `create-
 - **Fonts**: Geist Sans and Geist Mono from Google Fonts
 - **Build tool**: Turbopack (Next.js's new bundler)
 
+## Environment Variables
+This application requires environment variables for local development:
+
+- **DATABASE_URL**: PostgreSQL connection string for the database
+- **OPENAI_API_KEY**: OpenAI API key for AI-powered recipe formatting features
+
+### Local Development Setup
+1. Create a `.env.local` file (not committed to git)
+2. Set up local PostgreSQL using Docker - see [DOCKER_SETUP.md](DOCKER_SETUP.md) for complete instructions
+3. Add required environment variables:
+
+```env
+# Local Docker PostgreSQL (after following DOCKER_SETUP.md)
+DATABASE_URL="postgresql://postgres:password@localhost:5432/share_recipes_dev"
+
+# OpenAI API Key for AI features
+OPENAI_API_KEY="your_openai_api_key_here"
+```
+
+### Production Deployment (Vercel)
+- Set environment variables in Vercel dashboard (Settings → Environment Variables)
+- Never commit production credentials to git
+- No `.env` file is needed - Vercel handles environment variables via dashboard
+
 ## Development Commands
 ```bash
 # Start development server with Turbopack
