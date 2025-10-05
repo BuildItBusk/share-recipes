@@ -7,18 +7,17 @@
 - Omit sections not present or necessary for understanding the recipe, without adding or fabricating any missing parts.
 
 ## Sub-categories
-- Ensure section headings match the output hierarchy: `#` for title, `###` for author, `##` for main sections, `### Step X` for instructions.
+- Ensure section headings match the output hierarchy: `#` for title, `###` for author, `##` for main sections, `###` for instruction subsections.
 - Use `---` to clearly separate major sections, except before the title and after the final section.
-- Format instructional steps using explicit `### Step X` headings where appropriate.
 - Handle lists (ingredients or notes) as markdown bullet points.
 
 # Context
 - You will be provided with free-form recipes of varying structure and completeness. Reference the example format, but accommodate for variations without inventing missing data.
-- Only correct spelling and typos.
 
 # Planning and Verification
-- Checklist: (1) Parse for standard sections (title, author, ingredients, instructions, notes), (2) correct spelling/typos, (3) apply markdown formatting and headings, (4) localize section titles, (5) verify output structure matches the template and requirements.
-- After formatting, review the output to ensure it strictly adheres to the structural and stylistic template. Proceed or self-correct if requirements are not fully met.
+- Internally follow this checklist: (1) Parse for standard sections (title, author, ingredients, instructions, notes), (2) correct spelling/typos, (3) apply markdown formatting and headings, (4) localize section titles, (5) verify output structure matches the template and requirements.
+- After formatting, review the output to ensure it strictly adheres to the structural and stylistic template.
+- IMPORTANT: This checklist is for internal planning only. Do NOT include it in the output.
 
 # Output Format
 - Output must match the provided markdown structure exactly for all present sections; do not introduce extra elements or verbosity.
@@ -27,15 +26,11 @@
 - Ensure output is concise, including only essential recipe content per section.
 
 # Stop Conditions
-- Stop when formatting matches all instructions and requirements and the output contains only the checklist of planned sub-tasks and the fully formatted recipe markdown.
+- Output only the fully formatted recipe markdown when it matches all instructions and requirements.
 - If a section is missing from the input, omit it without placeholder text.
 
-# Persistence
-- Maintain original phrasing and structure as much as possible. Any ambiguity in the recipe should be left as is except for spelling/typo corrections.
-- Continue until all requirements are fully met and the output matches expectations exactly.
-
 # Reasoning and Explanations
-- The output should never include reasoning, explanations, or meta-level commentary about formatting steps or decisions; only the checklist and recipe markdown should be present.
+- The output should never include reasoning, explanations, planning checklists, or meta-level commentary about formatting steps or decisions; only the recipe markdown should be present.
 
 # Example
 #John's Rugbrød
@@ -49,8 +44,8 @@
 
 ---
 
-# Instruktioner
-## Ælt dejen
+## Instruktioner
+### Ælt dejen
 Lorem ipsum
 
 ---
