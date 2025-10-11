@@ -45,8 +45,14 @@ npm run build
 # Start production server
 npm start
 
-# Run ESLint
+# Run Biome linter and formatter check
 npm run lint
+
+# Auto-fix Biome issues
+npm run lint:fix
+
+# Format code with Biome
+npm run format
 ```
 
 ## Project Structure
@@ -58,12 +64,15 @@ npm run lint
 - Configuration files:
   - `next.config.ts` - Next.js configuration (currently minimal)
   - `tsconfig.json` - TypeScript config with path aliases (`@/*` maps to `./`)
-  - `eslint.config.mjs` - ESLint with Next.js and TypeScript rules
+  - `biome.json` - Biome configuration for linting and formatting
   - `postcss.config.mjs` - PostCSS configuration for TailwindCSS
 
 ## Key Details
 - Uses Turbopack for both development and production builds (faster than Webpack)
-- ESLint extends "next/core-web-vitals" and "next/typescript" configurations
+- **Biome** is used for linting and formatting (replaces ESLint + Prettier)
+  - Fast, Rust-based linter and formatter
+  - Configured with accessibility rules (button types, SVG labels, etc.)
+  - Uses tabs for indentation and double quotes for strings
 - Path alias `@/*` is configured to reference the root directory
 - No test framework is currently configured
 - Dark mode styling is already present in the default components using TailwindCSS classes

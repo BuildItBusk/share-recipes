@@ -1,54 +1,51 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '../../lib/db';
-import { generateUniqueRecipeId, createShareUrl } from '../../lib/utils';
+import { type NextRequest, NextResponse } from "next/server"
+import { prisma } from "../../lib/db"
+import { createShareUrl, generateUniqueRecipeId } from "../../lib/utils"
 
 export async function POST(request: NextRequest) {
-  try {
-    const { rawText, formattedText } = await request.json();
+	try {
+		const { rawText, formattedText } = await request.json()
 
-    if (!rawText || !formattedText) {
-      return NextResponse.json(
-        { error: 'Both rawText and formattedText are required' },
-        { status: 400 }
-      );
-    }
+		if (!rawText || !formattedText) {
+			return NextResponse.json(
+				{ error: "Both rawText and formattedText are required" },
+				{ status: 400 },
+			)
+		}
 
-    // Generate unique ID (handles collision detection and duplicate recipes)
-    const recipeId = await generateUniqueRecipeId(rawText, formattedText);
+		// Generate unique ID (handles collision detection and duplicate recipes)
+		const recipeId = await generateUniqueRecipeId(rawText, formattedText)
 
-    // Check if this exact recipe already exists (returned by generateUniqueRecipeId)
-    const existingRecipe = await prisma.recipe.findUnique({
-      where: { id: recipeId }
-    });
+		// Check if this exact recipe already exists (returned by generateUniqueRecipeId)
+		const existingRecipe = await prisma.recipe.findUnique({
+			where: { id: recipeId },
+		})
 
-    if (existingRecipe) {
-      // Recipe already exists, return existing ID
-      return NextResponse.json({
-        id: recipeId,
-        shareUrl: createShareUrl(recipeId),
-        existing: true
-      });
-    }
+		if (existingRecipe) {
+			// Recipe already exists, return existing ID
+			return NextResponse.json({
+				id: recipeId,
+				shareUrl: createShareUrl(recipeId),
+				existing: true,
+			})
+		}
 
-    // Save new recipe to database
-    const recipe = await prisma.recipe.create({
-      data: {
-        id: recipeId,
-        rawText,
-        formattedText,
-      }
-    });
+		// Save new recipe to database
+		const recipe = await prisma.recipe.create({
+			data: {
+				id: recipeId,
+				rawText,
+				formattedText,
+			},
+		})
 
-    return NextResponse.json({
-      id: recipe.id,
-      shareUrl: createShareUrl(recipe.id),
-      existing: false
-    });
-  } catch (error) {
-    console.error('Error saving recipe:', error);
-    return NextResponse.json(
-      { error: 'Failed to save recipe' },
-      { status: 500 }
-    );
-  }
+		return NextResponse.json({
+			id: recipe.id,
+			shareUrl: createShareUrl(recipe.id),
+			existing: false,
+		})
+	} catch (error) {
+		console.error("Error saving recipe:", error)
+		return NextResponse.json({ error: "Failed to save recipe" }, { status: 500 })
+	}
 }
