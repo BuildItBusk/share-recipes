@@ -23,7 +23,7 @@ This application requires environment variables for local development:
 
 ```env
 # Local Docker PostgreSQL (after following DOCKER_SETUP.md)
-DATABASE_URL="postgresql://postgres:password@localhost:5432/share_recipes_dev"
+DATABASE_URL="postgresql://postgres:password@localhost:5432/paste_recipe_dev"
 
 # OpenAI API Key for AI features
 OPENAI_API_KEY="your_openai_api_key_here"

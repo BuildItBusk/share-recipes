@@ -42,13 +42,13 @@ export default function SharedRecipePage({ recipe }: SharedRecipePageProps) {
 					>
 						<Image
 							src="/paste_recipe_logo.png"
-							alt="Share Recipes logo"
+							alt="Paste Recipe logo"
 							width={40}
 							height={40}
 							className="sm:w-12 sm:h-12"
 							priority
 						/>
-						<h1 className="text-xl sm:text-2xl font-medium text-white">Share Recipes</h1>
+						<h1 className="text-xl sm:text-2xl font-medium text-white">Paste Recipe</h1>
 					</Link>
 				</header>
 

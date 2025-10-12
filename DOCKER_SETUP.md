@@ -11,10 +11,10 @@ When you're ready to set up a local PostgreSQL database with Docker, follow thes
 **PowerShell (recommended for Windows):**
 ```powershell
 # Create and start PostgreSQL container
-docker run --name share-recipes-postgres `
+docker run --name paste-recipe-postgres `
   -e POSTGRES_PASSWORD=password `
   -e POSTGRES_USER=postgres `
-  -e POSTGRES_DB=share_recipes_dev `
+  -e POSTGRES_DB=paste_recipe_dev `
   -p 5432:5432 `
   -d postgres:15
 
@@ -24,7 +24,7 @@ docker ps
 
 **Or as a single line (for other terminals):**
 ```powershell
-docker run --name share-recipes-postgres -e POSTGRES_PASSWORD=password -e POSTGRES_USER=postgres -e POSTGRES_DB=share_recipes_dev -p 5432:5432 -d postgres:15
+docker run --name paste-recipe-postgres -e POSTGRES_PASSWORD=password -e POSTGRES_USER=postgres -e POSTGRES_DB=paste_recipe_dev -p 5432:5432 -d postgres:15
 
 # Verify it's running
 docker ps
@@ -34,7 +34,7 @@ docker ps
 Update your `.env` file:
 ```env
 # Local Docker PostgreSQL
-DATABASE_URL="postgresql://postgres:password@localhost:5432/share_recipes_dev"
+DATABASE_URL="postgresql://postgres:password@localhost:5432/paste_recipe_dev"
 ```
 
 ## 4. Run Database Migration
@@ -49,16 +49,16 @@ npx prisma studio
 ## 5. Docker Commands (Future Reference)
 ```bash
 # Start the container (if stopped)
-docker start share-recipes-postgres
+docker start paste-recipe-postgres
 
 # Stop the container
-docker stop share-recipes-postgres
+docker stop paste-recipe-postgres
 
 # Remove the container (deletes all data)
-docker rm share-recipes-postgres
+docker rm paste-recipe-postgres
 
 # View logs
-docker logs share-recipes-postgres
+docker logs paste-recipe-postgres
 ```
 
 ## Benefits of Docker Setup

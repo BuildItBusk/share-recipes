@@ -9,7 +9,7 @@ const geistSans = Geist({
 })
 
 export const metadata: Metadata = {
-	title: "Share Recipes - AI-Powered Recipe Formatter",
+	title: "Paste Recipe - AI-Powered Recipe Formatter",
 	description:
 		"Format and share your recipes with AI. Paste any recipe text and get a beautifully formatted, shareable version instantly.",
 }

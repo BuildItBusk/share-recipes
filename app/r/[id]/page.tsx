@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: PageProps) {
 	const title = titleMatch ? titleMatch[1] : "Shared Recipe"
 
 	return {
-		title: `${title} | Share Recipes`,
+		title: `${title} | Paste Recipe`,
 		description: "A shared recipe formatted and ready to cook!",
 	}
 }

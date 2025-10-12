@@ -11,12 +11,12 @@ export default function Home() {
 						<div className="flex items-center gap-2 max-w-4xl mx-auto">
 							<Image
 								src="/paste_recipe_logo.png"
-								alt="Share Recipes logo"
+								alt="Paste Recipe logo"
 								width={48}
 								height={48}
 								priority
 							/>
-							<h1 className="text-2xl font-medium text-white">Share Recipes</h1>
+							<h1 className="text-2xl font-medium text-white">Paste Recipe</h1>
 						</div>
 					</header>
 					<RecipeTabs />
