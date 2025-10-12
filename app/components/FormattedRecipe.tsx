@@ -77,8 +77,9 @@ export default function FormattedRecipe() {
 					type="button"
 					onClick={handleSaveAndShare}
 					disabled={isSaving}
-					className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors text-sm whitespace-nowrap"
+					className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors text-sm whitespace-nowrap flex items-center justify-center gap-2"
 				>
+					{isSaving && <div className="spinner" />}
 					{isSaving ? "Saving..." : "Save & Share"}
 				</button>
 			</div>

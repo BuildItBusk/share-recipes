@@ -76,8 +76,9 @@ export default function PasteRecipe() {
 				type="button"
 				onClick={handleFormat}
 				disabled={isLoading || !recipeText.trim()}
-				className="w-full bg-white text-black py-3 px-4 rounded-md hover:bg-gray-200 disabled:bg-gray-600 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
+				className="w-full bg-white text-black py-3 px-4 rounded-md hover:bg-gray-200 disabled:bg-gray-600 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
 			>
+				{isLoading && <div className="spinner" />}
 				{isLoading ? "Formatting..." : "Format Recipe"}
 			</button>
 		</div>
