@@ -2,8 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import ReactMarkdown from "react-markdown"
-import remarkGfm from "remark-gfm"
+import MarkdownRenderer from "./MarkdownRenderer"
 import { useRecipe } from "./RecipeContext"
 
 export default function FormattedRecipe() {
@@ -89,27 +88,7 @@ export default function FormattedRecipe() {
 			)}
 
 			<div className="bg-gray-900 border border-gray-600 rounded-md p-6">
-				<ReactMarkdown
-					remarkPlugins={[remarkGfm]}
-					components={{
-						h1: (props) => <h1 className="text-2xl font-bold mb-4 text-white" {...props} />,
-						h2: (props) => <h2 className="text-xl font-semibold mt-6 mb-3 text-white" {...props} />,
-						h3: (props) => (
-							<h3 className="text-lg font-medium mt-4 mb-2 text-gray-200" {...props} />
-						),
-						p: (props) => <p className="mb-3 text-gray-300" {...props} />,
-						ul: (props) => (
-							<ul className="list-disc list-inside space-y-1 mb-4 text-gray-300" {...props} />
-						),
-						ol: (props) => (
-							<ol className="list-decimal list-inside space-y-1 mb-4 text-gray-300" {...props} />
-						),
-						li: (props) => <li className="ml-4 text-gray-300" {...props} />,
-						hr: (props) => <hr className="my-4 border-gray-600" {...props} />,
-					}}
-				>
-					{formattedRecipe}
-				</ReactMarkdown>
+				<MarkdownRenderer content={formattedRecipe} />
 			</div>
 		</div>
 	)

@@ -3,6 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { useState } from "react"
+import MarkdownRenderer from "@/app/components/MarkdownRenderer"
 
 interface Recipe {
 	id: string
@@ -102,36 +103,7 @@ export default function SharedRecipePage({ recipe }: SharedRecipePageProps) {
 					</div>
 
 					<div className="bg-gray-900 border border-gray-600 rounded-md p-4 sm:p-6">
-						<div
-							className="prose max-w-none text-white text-sm sm:text-base"
-							dangerouslySetInnerHTML={{
-								__html: recipe.formattedText
-									.replace(
-										/^# (.*$)/gm,
-										'<h1 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-white">$1</h1>',
-									)
-									.replace(
-										/^## (.*$)/gm,
-										'<h2 class="text-lg sm:text-xl font-semibold mt-4 sm:mt-6 mb-2 sm:mb-3 text-white">$1</h2>',
-									)
-									.replace(
-										/^### (.*$)/gm,
-										'<h3 class="text-base sm:text-lg font-medium mt-3 sm:mt-4 mb-2 text-gray-200">$1</h3>',
-									)
-									.replace(/^- (.*$)/gm, '<li class="ml-4 text-gray-300 leading-relaxed">$1</li>')
-									.replace(/^---$/gm, '<hr class="my-3 sm:my-4 border-gray-600">')
-									.replace(/\n\n/g, '</p><p class="mb-2 sm:mb-3 text-gray-300 leading-relaxed">')
-									.replace(
-										/^(?!<[h|l|p])/gm,
-										'<p class="mb-2 sm:mb-3 text-gray-300 leading-relaxed">',
-									)
-									.replace(
-										/(<li.*<\/li>)/g,
-										'<ul class="list-disc list-inside space-y-1 mb-3 sm:mb-4 pl-2 sm:pl-0">$1</ul>',
-									)
-									.replace(/<\/li><li/g, "</li><li"),
-							}}
-						/>
+						<MarkdownRenderer content={recipe.formattedText} />
 					</div>
 				</div>
 			</div>
