@@ -1,9 +1,33 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { formatRecipeRatelimit, getClientIp } from "../../lib/ratelimit"
 import { formatRecipe } from "./formatting"
 import { validateIsRecipe } from "./validation"
 
 export async function POST(request: NextRequest) {
 	try {
+		// Rate limiting check
+		const ip = getClientIp(request)
+		const { success, limit, remaining, reset } = await formatRecipeRatelimit.limit(ip)
+
+		if (!success) {
+			return NextResponse.json(
+				{
+					error: "Too many requests. Please try again later.",
+					limit,
+					remaining,
+					reset: new Date(reset).toISOString(),
+				},
+				{
+					status: 429,
+					headers: {
+						"X-RateLimit-Limit": limit.toString(),
+						"X-RateLimit-Remaining": remaining.toString(),
+						"X-RateLimit-Reset": reset.toString(),
+					},
+				},
+			)
+		}
+
 		const { recipe } = await request.json()
 
 		if (!recipe || typeof recipe !== "string") {

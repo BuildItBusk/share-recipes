@@ -1,9 +1,33 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { prisma } from "../../lib/db"
+import { getClientIp, saveRecipeRatelimit } from "../../lib/ratelimit"
 import { createShareUrl, generateUniqueRecipeId } from "../../lib/utils"
 
 export async function POST(request: NextRequest) {
 	try {
+		// Rate limiting check
+		const ip = getClientIp(request)
+		const { success, limit, remaining, reset } = await saveRecipeRatelimit.limit(ip)
+
+		if (!success) {
+			return NextResponse.json(
+				{
+					error: "Too many requests. Please try again later.",
+					limit,
+					remaining,
+					reset: new Date(reset).toISOString(),
+				},
+				{
+					status: 429,
+					headers: {
+						"X-RateLimit-Limit": limit.toString(),
+						"X-RateLimit-Remaining": remaining.toString(),
+						"X-RateLimit-Reset": reset.toString(),
+					},
+				},
+			)
+		}
+
 		const { rawText, formattedText } = await request.json()
 
 		if (!rawText || !formattedText) {
