@@ -10,6 +10,21 @@ This is a Next.js 15 application for sharing recipes, bootstrapped with `create-
 - **Fonts**: Geist Sans and Geist Mono from Google Fonts
 - **Build tool**: Turbopack (Next.js's new bundler)
 
+## Current Status & TODO
+
+**See [TODO.md](TODO.md) for technical debt, infrastructure improvements, and maintenance tasks.**
+
+This is a hobby project deployed directly to production. TODO.md tracks non-feature work only:
+- Technical debt and refactoring
+- Infrastructure and tooling improvements
+- Security hardening and performance optimization
+- Bug fixes and code quality enhancements
+
+⚠️ **IMPORTANT**: `TODO.md` is committed to the repository and publicly visible.
+- DO NOT add secrets, credentials, API keys, or private information to TODO.md
+- Use `.env.local` (gitignored) for sensitive configuration
+- Use private notes for sensitive task details
+
 ## Environment Variables
 This application requires environment variables for local development:
 
