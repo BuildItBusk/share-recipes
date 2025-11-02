@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { formatRecipeRatelimit, getClientIp } from "../../lib/ratelimit"
 import { formatRecipe } from "./formatting"
-import { validateIsRecipe } from "./validation"
+import { FormatRecipeSchema, validateIsRecipe } from "./validation"
 
 export async function POST(request: NextRequest) {
 	try {
@@ -28,11 +28,24 @@ export async function POST(request: NextRequest) {
 			)
 		}
 
-		const { recipe } = await request.json()
+		// Validate input with Zod
+		const body = await request.json()
+		const result = FormatRecipeSchema.safeParse(body)
 
-		if (!recipe || typeof recipe !== "string") {
-			return NextResponse.json({ error: "Recipe text is required" }, { status: 400 })
+		if (!result.success) {
+			return NextResponse.json(
+				{
+					error: "Validation failed",
+					issues: result.error.issues.map((issue) => ({
+						path: issue.path.join("."),
+						message: issue.message,
+					})),
+				},
+				{ status: 400 },
+			)
 		}
+
+		const { recipe } = result.data
 
 		// Step 1: Validate that the input is actually a recipe
 		const validation = await validateIsRecipe(recipe)

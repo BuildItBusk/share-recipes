@@ -1,8 +1,20 @@
 import OpenAI from "openai"
+import { z } from "zod"
+import { env } from "../../lib/env"
 
 const openai = new OpenAI({
-	apiKey: process.env.OPENAI_API_KEY,
+	apiKey: env.OPENAI_API_KEY,
 })
+
+export const FormatRecipeSchema = z.object({
+	recipe: z
+		.string()
+		.min(10, "Recipe must be at least 10 characters")
+		.max(200000, "Recipe exceeds maximum length of 200,000 characters")
+		.trim(),
+})
+
+export type FormatRecipeInput = z.infer<typeof FormatRecipeSchema>
 
 export interface ValidationResult {
 	isRecipe: boolean

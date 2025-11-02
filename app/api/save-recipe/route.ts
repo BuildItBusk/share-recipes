@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { prisma } from "../../lib/db"
 import { getClientIp, saveRecipeRatelimit } from "../../lib/ratelimit"
 import { createShareUrl, generateUniqueRecipeId } from "../../lib/utils"
+import { SaveRecipeSchema } from "./validation"
 
 export async function POST(request: NextRequest) {
 	try {
@@ -28,14 +29,24 @@ export async function POST(request: NextRequest) {
 			)
 		}
 
-		const { rawText, formattedText } = await request.json()
+		// Validate input with Zod
+		const body = await request.json()
+		const result = SaveRecipeSchema.safeParse(body)
 
-		if (!rawText || !formattedText) {
+		if (!result.success) {
 			return NextResponse.json(
-				{ error: "Both rawText and formattedText are required" },
+				{
+					error: "Validation failed",
+					issues: result.error.issues.map((issue) => ({
+						path: issue.path.join("."),
+						message: issue.message,
+					})),
+				},
 				{ status: 400 },
 			)
 		}
+
+		const { rawText, formattedText } = result.data
 
 		// Generate unique ID (handles collision detection and duplicate recipes)
 		const recipeId = await generateUniqueRecipeId(rawText, formattedText)

@@ -1,15 +1,24 @@
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
 import OpenAI from "openai"
+import { env } from "../../lib/env"
 
 const openai = new OpenAI({
-	apiKey: process.env.OPENAI_API_KEY,
+	apiKey: env.OPENAI_API_KEY,
 })
 
+// Cache system prompt at module load time (performance optimization)
+let cachedSystemPrompt: string | null = null
+
 function getSystemPrompt(): string {
+	if (cachedSystemPrompt) {
+		return cachedSystemPrompt
+	}
+
 	try {
 		const promptPath = join(process.cwd(), "specs", "system-message.txt")
-		return readFileSync(promptPath, "utf-8")
+		cachedSystemPrompt = readFileSync(promptPath, "utf-8")
+		return cachedSystemPrompt
 	} catch (error) {
 		console.error("Error reading system prompt file:", error)
 		throw new Error("Failed to load system prompt")
