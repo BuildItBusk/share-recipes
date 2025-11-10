@@ -33,7 +33,9 @@ export default function FormattedRecipe() {
 			if (!response.ok) {
 				// Handle validation errors with detailed issues
 				if (data.issues && data.issues.length > 0) {
-					const issueMessages = data.issues.map((issue: { message: string }) => issue.message).join(", ")
+					const issueMessages = data.issues
+						.map((issue: { message: string }) => issue.message)
+						.join(", ")
 					throw new Error(`${data.error}: ${issueMessages}`)
 				}
 				throw new Error(data.error || "Failed to save recipe")
