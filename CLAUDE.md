@@ -26,17 +26,21 @@ This is a hobby project deployed directly to production. TODO.md tracks non-feat
 - Use private notes for sensitive task details
 
 ## Environment Variables
-This application requires environment variables for local development:
 
+### Required Variables
 - **DATABASE_URL**: PostgreSQL connection string for the database
 - **OPENAI_API_KEY**: OpenAI API key for AI-powered recipe formatting features
+
+### Optional Variables (Development Only)
 - **KV_REST_API_URL**: Upstash Redis REST API URL for rate limiting (auto-injected by Vercel KV)
 - **KV_REST_API_TOKEN**: Upstash Redis REST API token for rate limiting (auto-injected by Vercel KV)
+  - **Optional for local development**: Rate limiting is skipped if credentials are missing
+  - **Required for production**: App startup will fail with a clear error if credentials are missing in production environment
 
 ### Local Development Setup
 1. Create a `.env.local` file (not committed to git)
 2. Set up local PostgreSQL using Docker - see [DOCKER_SETUP.md](DOCKER_SETUP.md) for complete instructions
-3. Add required environment variables:
+3. Add required environment variables (minimum to run locally):
 
 ```env
 # Local Docker PostgreSQL (after following DOCKER_SETUP.md)
@@ -44,8 +48,14 @@ DATABASE_URL="postgresql://postgres:password@localhost:5432/paste_recipe_dev"
 
 # OpenAI API Key for AI features
 OPENAI_API_KEY="your_openai_api_key_here"
+```
 
-# Vercel KV (Redis) for rate limiting - get from Vercel dashboard after creating KV database
+4. **Optional**: Add Vercel KV credentials for testing rate limiting locally:
+
+```env
+# Vercel KV (Redis) for rate limiting - optional for development
+# If not provided, rate limiting is disabled (all requests allowed)
+# Get from Vercel dashboard after creating a KV database
 KV_REST_API_URL="your_kv_rest_api_url_here"
 KV_REST_API_TOKEN="your_kv_rest_api_token_here"
 ```

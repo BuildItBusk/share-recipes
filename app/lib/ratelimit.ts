@@ -1,24 +1,48 @@
 import { Ratelimit } from "@upstash/ratelimit"
 import { Redis } from "@upstash/redis"
+import { isRateLimitingAvailable } from "./env"
 
-// Create Redis client from environment variables
-// These will be auto-injected by Vercel when you create a KV database
-const redis = Redis.fromEnv()
+// No-op rate limiter for when KV credentials are not available
+// Always allows requests (never rate limits)
+const noOpRatelimit = {
+	limit: async () => ({
+		success: true,
+		limit: 0,
+		remaining: 0,
+		reset: Date.now(),
+		pending: Promise.resolve(),
+	}),
+}
 
-// Rate limiters for different endpoints
-export const formatRecipeRatelimit = new Ratelimit({
-	redis,
-	limiter: Ratelimit.slidingWindow(30, "1 h"),
-	analytics: true,
-	prefix: "@ratelimit/format-recipe",
-})
+// Create real rate limiters only if KV credentials are available
+let formatRecipeRatelimit: Ratelimit | typeof noOpRatelimit
+let saveRecipeRatelimit: Ratelimit | typeof noOpRatelimit
 
-export const saveRecipeRatelimit = new Ratelimit({
-	redis,
-	limiter: Ratelimit.slidingWindow(20, "1 h"),
-	analytics: true,
-	prefix: "@ratelimit/save-recipe",
-})
+if (isRateLimitingAvailable()) {
+	// Create Redis client from environment variables
+	// These will be auto-injected by Vercel when you create a KV database
+	const redis = Redis.fromEnv()
+
+	formatRecipeRatelimit = new Ratelimit({
+		redis,
+		limiter: Ratelimit.slidingWindow(30, "1 h"),
+		analytics: true,
+		prefix: "@ratelimit/format-recipe",
+	})
+
+	saveRecipeRatelimit = new Ratelimit({
+		redis,
+		limiter: Ratelimit.slidingWindow(20, "1 h"),
+		analytics: true,
+		prefix: "@ratelimit/save-recipe",
+	})
+} else {
+	// Fallback to no-op limiters in development without KV credentials
+	formatRecipeRatelimit = noOpRatelimit
+	saveRecipeRatelimit = noOpRatelimit
+}
+
+export { formatRecipeRatelimit, saveRecipeRatelimit }
 
 // Helper to get client IP from request
 export function getClientIp(request: Request): string {
