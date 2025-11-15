@@ -6,13 +6,24 @@ const openai = new OpenAI({
 	apiKey: env.OPENAI_API_KEY,
 })
 
-export const FormatRecipeSchema = z.object({
-	recipe: z
-		.string()
-		.min(10, "Recipe must be at least 10 characters")
-		.max(200000, "Recipe exceeds maximum length of 200,000 characters")
-		.trim(),
-})
+export const FormatRecipeSchema = z
+	.object({
+		recipe: z
+			.string()
+			.min(10, "Recipe must be at least 10 characters")
+			.max(200000, "Recipe exceeds maximum length of 200,000 characters")
+			.trim()
+			.optional(),
+		recipeUrl: z.string().url("Invalid URL format").optional(),
+	})
+	.refine(
+		(data) => data.recipe || data.recipeUrl,
+		"Either recipe text or recipeUrl must be provided",
+	)
+	.refine(
+		(data) => !(data.recipe && data.recipeUrl),
+		"Provide either recipe text or recipeUrl, not both",
+	)
 
 export type FormatRecipeInput = z.infer<typeof FormatRecipeSchema>
 

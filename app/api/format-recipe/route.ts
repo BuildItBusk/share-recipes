@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { formatRecipeRatelimit, getClientIp } from "../../lib/ratelimit"
+import { fetchUrlContent } from "./url-utils"
 import { formatRecipe } from "./formatting"
 import { FormatRecipeSchema, validateIsRecipe } from "./validation"
 
@@ -45,10 +46,28 @@ export async function POST(request: NextRequest) {
 			)
 		}
 
-		const { recipe } = result.data
+		const { recipe, recipeUrl } = result.data
+
+		// Step 0: If URL is provided, fetch and extract content
+		let recipeContent: string
+		if (recipeUrl) {
+			const fetchResult = await fetchUrlContent(recipeUrl)
+
+			if (fetchResult.error) {
+				return NextResponse.json(
+					{ error: fetchResult.error },
+					{ status: fetchResult.status || 500 },
+				)
+			}
+
+			recipeContent = fetchResult.html
+		} else {
+			// At this point, schema validation ensures recipe is provided
+			recipeContent = recipe as string
+		}
 
 		// Step 1: Validate that the input is actually a recipe
-		const validation = await validateIsRecipe(recipe)
+		const validation = await validateIsRecipe(recipeContent)
 
 		if (!validation.isRecipe) {
 			return NextResponse.json(
@@ -62,7 +81,7 @@ export async function POST(request: NextRequest) {
 		}
 
 		// Step 2: Format the recipe
-		const formattedRecipe = await formatRecipe(recipe)
+		const formattedRecipe = await formatRecipe(recipeContent)
 
 		return NextResponse.json({ formattedRecipe })
 	} catch (error) {
