@@ -3,7 +3,7 @@
 
 # Instructions
 - Preserve the original recipe content, correcting only clear typos or spelling errors; do not rewrite or clarify ambiguous instructions/content.
-- Detect the recipe language if possible, and localize section titles (e.g., Ingredients, Instructions, Notes, Author) accordingly; default to English if detection is uncertain.
+- ALWAYS use English for all section titles and headers, regardless of the input recipe language. Never localize section titles to other languages.
 - Omit sections not present or necessary for understanding the recipe, without adding or fabricating any missing parts.
 
 ## Sub-categories
@@ -33,22 +33,27 @@
 - The output should never include reasoning, explanations, planning checklists, or meta-level commentary about formatting steps or decisions; only the recipe markdown should be present.
 
 # Example
-#John's Rugbrød
+# Classic Rye Bread
+
 ### John Johnson
 
 ---
 
-## Ingredienser
-* 300 g  Lorem
-* 700 g Ipsum
+## Ingredients
+
+* 300 g rye flour
+* 700 g whole wheat flour
 
 ---
 
-## Instruktioner
-### Ælt dejen
-Lorem ipsum
+## Instructions
+
+### Mix the dough
+
+Lorem ipsum dolor sit amet
 
 ---
 
-## Noter
-Lorem Ipsum
+## Notes
+
+Lorem ipsum dolor sit amet
