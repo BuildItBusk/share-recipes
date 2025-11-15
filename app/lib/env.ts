@@ -4,10 +4,11 @@ import { z } from "zod"
  * Environment variable validation schema
  * This ensures all required environment variables are present at startup
  * Note: KV (Redis) is optional for local development but required for production
+ * Note: DATABASE_URL is optional at build time (when parsing during API route compilation)
  */
 const envSchema = z.object({
 	OPENAI_API_KEY: z.string().min(1, "OPENAI_API_KEY is required"),
-	DATABASE_URL: z.string().url("DATABASE_URL must be a valid URL"),
+	DATABASE_URL: z.string().url("DATABASE_URL must be a valid URL").optional(),
 	KV_REST_API_URL: z.string().url("KV_REST_API_URL must be a valid URL").optional(),
 	KV_REST_API_TOKEN: z.string().min(1, "KV_REST_API_TOKEN is required").optional(),
 	NODE_ENV: z.enum(["development", "production", "test"]).optional(),
