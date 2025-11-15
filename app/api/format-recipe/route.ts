@@ -86,10 +86,10 @@ export async function POST(request: NextRequest) {
 			)
 		}
 
-		// Step 2: Format the recipe
-		const formattedRecipe = await formatRecipe(recipeContent)
+		// Step 2: Format the recipe with metadata
+		const formattedRecipe = await formatRecipe(recipeContent, metadata)
 
-		return NextResponse.json({ formattedRecipe, metadata })
+		return NextResponse.json({ formattedRecipe })
 	} catch (error) {
 		console.error("Error formatting recipe:", error)
 		return NextResponse.json({ error: "Internal server error" }, { status: 500 })
