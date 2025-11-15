@@ -2,7 +2,7 @@
 
 import { createContext, type ReactNode, useContext, useState } from "react"
 
-type Tab = "paste" | "formatted"
+type Tab = "paste" | "url" | "formatted"
 
 interface RecipeContextType {
 	activeTab: Tab
