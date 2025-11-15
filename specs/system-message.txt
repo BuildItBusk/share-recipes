@@ -32,28 +32,33 @@
 # Reasoning and Explanations
 - The output should never include reasoning, explanations, planning checklists, or meta-level commentary about formatting steps or decisions; only the recipe markdown should be present.
 
-# Example
-# Classic Rye Bread
+# Example Format
+# Basic Pasta
 
-### John Johnson
+### Chef Maria
 
 ---
 
 ## Ingredients
 
-* 300 g rye flour
-* 700 g whole wheat flour
+* 400 g pasta
+* 2 cloves garlic, minced
+* Salt to taste
 
 ---
 
 ## Instructions
 
-### Mix the dough
+### Cook the pasta
 
-Lorem ipsum dolor sit amet
+Boil water in a large pot. Add salt and cook pasta until al dente.
+
+### Make the sauce
+
+Heat oil in a pan and sauté garlic until fragrant.
 
 ---
 
-## Notes
+**Source Information**
 
-Lorem ipsum dolor sit amet
+- Source: [Basic Pasta Recipe](https://example.com/recipes/basic-pasta)
