@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { formatRecipeRatelimit, getClientIp } from "../../lib/ratelimit"
-import { fetchUrlContent } from "./url-utils"
 import { formatRecipe } from "./formatting"
+import { extractMetadata, fetchUrlContent, type RecipeMetadata, stripHtmlTags } from "./url-utils"
 import { FormatRecipeSchema, validateIsRecipe } from "./validation"
 
 export async function POST(request: NextRequest) {
@@ -50,6 +50,8 @@ export async function POST(request: NextRequest) {
 
 		// Step 0: If URL is provided, fetch and extract content
 		let recipeContent: string
+		let metadata: RecipeMetadata = {}
+
 		if (recipeUrl) {
 			const fetchResult = await fetchUrlContent(recipeUrl)
 
@@ -60,7 +62,11 @@ export async function POST(request: NextRequest) {
 				)
 			}
 
-			recipeContent = fetchResult.html
+			// Extract metadata before stripping HTML
+			metadata = extractMetadata(fetchResult.html, recipeUrl)
+
+			// Strip HTML tags and clean content
+			recipeContent = stripHtmlTags(fetchResult.html)
 		} else {
 			// At this point, schema validation ensures recipe is provided
 			recipeContent = recipe as string
@@ -83,7 +89,7 @@ export async function POST(request: NextRequest) {
 		// Step 2: Format the recipe
 		const formattedRecipe = await formatRecipe(recipeContent)
 
-		return NextResponse.json({ formattedRecipe })
+		return NextResponse.json({ formattedRecipe, metadata })
 	} catch (error) {
 		console.error("Error formatting recipe:", error)
 		return NextResponse.json({ error: "Internal server error" }, { status: 500 })
