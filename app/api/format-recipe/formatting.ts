@@ -27,26 +27,29 @@ function getSystemPrompt(): string {
 }
 
 /**
- * Builds an attribution section from metadata if available
+ * Injects source attribution into formatted recipe, placing it after the author line
  */
-function buildAttributionSection(metadata?: RecipeMetadata): string {
+function injectSourceAttribution(recipe: string, metadata?: RecipeMetadata): string {
 	if (!metadata || (!metadata.author && !metadata.source)) {
-		return ""
+		return recipe
 	}
 
-	let attribution = "\n\n---\n\n**Source Information**\n"
-
-	if (metadata.author) {
-		attribution += `- Author: ${metadata.author}\n`
+	// Find the author line (starts with ###)
+	const authorLineMatch = recipe.match(/^(###[^\n]*)/m)
+	if (!authorLineMatch) {
+		return recipe
 	}
 
+	let sourceAttribution = ""
 	if (metadata.source) {
 		const source = metadata.source
-		const sourceUrl = metadata.sourceUrl ? ` [${source}](${metadata.sourceUrl})` : source
-		attribution += `- Source: ${sourceUrl}\n`
+		const sourceUrl = metadata.sourceUrl ? `[${source}](${metadata.sourceUrl})` : source
+		sourceAttribution = `*From ${sourceUrl}*\n`
 	}
 
-	return attribution
+	// Insert after the author line
+	const insertPoint = authorLineMatch.index! + authorLineMatch[0].length
+	return recipe.slice(0, insertPoint) + "\n" + sourceAttribution + recipe.slice(insertPoint)
 }
 
 export async function formatRecipe(recipe: string, metadata?: RecipeMetadata): Promise<string> {
@@ -78,9 +81,8 @@ export async function formatRecipe(recipe: string, metadata?: RecipeMetadata): P
 		throw new Error("Failed to format recipe")
 	}
 
-	// Add attribution section if metadata is available
-	const attribution = buildAttributionSection(metadata)
-	formattedRecipe += attribution
+	// Inject source attribution after author line if metadata is available
+	formattedRecipe = injectSourceAttribution(formattedRecipe, metadata)
 
 	return formattedRecipe
 }

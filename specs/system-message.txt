@@ -36,6 +36,7 @@
 # Basic Pasta
 
 ### Chef Maria
+*From [Basic Pasta Recipe](https://example.com/recipes/basic-pasta)*
 
 ---
 
@@ -56,9 +57,3 @@ Boil water in a large pot. Add salt and cook pasta until al dente.
 ### Make the sauce
 
 Heat oil in a pan and sauté garlic until fragrant.
-
----
-
-**Source Information**
-
-- Source: [Basic Pasta Recipe](https://example.com/recipes/basic-pasta)
