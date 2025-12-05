@@ -71,7 +71,7 @@ export async function formatRecipe(recipe: string, metadata?: RecipeMetadata): P
 	const result = await openai.responses.create({
 		model: "gpt-5-nano",
 		input: fullPrompt,
-		reasoning: { effort: "minimal" },
+		reasoning: { effort: "low" },
 		text: { verbosity: "low" },
 	})
 
