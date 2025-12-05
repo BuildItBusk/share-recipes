@@ -6,24 +6,32 @@ import { FormatRecipeSchema, validateIsRecipe } from "./validation"
 
 export async function POST(request: NextRequest) {
 	try {
-		// Rate limiting check
+		// Rate limiting check with fallback on error
 		const ip = getClientIp(request)
-		const { success, limit, remaining, reset } = await formatRecipeRatelimit.limit(ip)
+		let rateLimitResult: { success: boolean; limit: number; remaining: number; reset: number }
 
-		if (!success) {
+		try {
+			rateLimitResult = await formatRecipeRatelimit.limit(ip)
+		} catch (rateLimitError) {
+			// If rate limiting fails (e.g., Redis connection error), log and continue without rate limiting
+			console.warn("⚠️  Rate limiting check failed, allowing request:", rateLimitError)
+			rateLimitResult = { success: true, limit: 0, remaining: 0, reset: Date.now() }
+		}
+
+		if (!rateLimitResult.success) {
 			return NextResponse.json(
 				{
 					error: "Too many requests. Please try again later.",
-					limit,
-					remaining,
-					reset: new Date(reset).toISOString(),
+					limit: rateLimitResult.limit,
+					remaining: rateLimitResult.remaining,
+					reset: new Date(rateLimitResult.reset).toISOString(),
 				},
 				{
 					status: 429,
 					headers: {
-						"X-RateLimit-Limit": limit.toString(),
-						"X-RateLimit-Remaining": remaining.toString(),
-						"X-RateLimit-Reset": reset.toString(),
+						"X-RateLimit-Limit": rateLimitResult.limit.toString(),
+						"X-RateLimit-Remaining": rateLimitResult.remaining.toString(),
+						"X-RateLimit-Reset": rateLimitResult.reset.toString(),
 					},
 				},
 			)

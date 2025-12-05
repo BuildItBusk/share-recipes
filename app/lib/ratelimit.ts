@@ -19,23 +19,30 @@ let formatRecipeRatelimit: Ratelimit | typeof noOpRatelimit
 let saveRecipeRatelimit: Ratelimit | typeof noOpRatelimit
 
 if (isRateLimitingAvailable()) {
-	// Create Redis client from environment variables
-	// These will be auto-injected by Vercel when you create a KV database
-	const redis = Redis.fromEnv()
+	try {
+		// Create Redis client from environment variables
+		// These will be auto-injected by Vercel when you create a KV database
+		const redis = Redis.fromEnv()
 
-	formatRecipeRatelimit = new Ratelimit({
-		redis,
-		limiter: Ratelimit.slidingWindow(30, "1 h"),
-		analytics: true,
-		prefix: "@ratelimit/format-recipe",
-	})
+		formatRecipeRatelimit = new Ratelimit({
+			redis,
+			limiter: Ratelimit.slidingWindow(30, "1 h"),
+			analytics: true,
+			prefix: "@ratelimit/format-recipe",
+		})
 
-	saveRecipeRatelimit = new Ratelimit({
-		redis,
-		limiter: Ratelimit.slidingWindow(20, "1 h"),
-		analytics: true,
-		prefix: "@ratelimit/save-recipe",
-	})
+		saveRecipeRatelimit = new Ratelimit({
+			redis,
+			limiter: Ratelimit.slidingWindow(20, "1 h"),
+			analytics: true,
+			prefix: "@ratelimit/save-recipe",
+		})
+	} catch (error) {
+		// If Redis initialization fails, fall back to no-op limiter
+		console.warn("⚠️  Failed to initialize Redis rate limiting, falling back to no-op:", error)
+		formatRecipeRatelimit = noOpRatelimit
+		saveRecipeRatelimit = noOpRatelimit
+	}
 } else {
 	// Fallback to no-op limiters in development without KV credentials
 	formatRecipeRatelimit = noOpRatelimit
