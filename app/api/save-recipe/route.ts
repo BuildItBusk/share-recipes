@@ -4,6 +4,8 @@ import { getClientIp, saveRecipeRatelimit } from "../../lib/ratelimit"
 import { createShareUrl, generateUniqueRecipeId } from "../../lib/utils"
 import { SaveRecipeSchema } from "./validation"
 
+export const runtime = "nodejs"
+
 export async function POST(request: NextRequest) {
 	try {
 		// Rate limiting check with fallback on error

@@ -4,6 +4,8 @@ import { formatRecipe } from "./formatting"
 import { extractMetadata, fetchUrlContent, type RecipeMetadata, stripHtmlTags } from "./url-utils"
 import { FormatRecipeSchema, validateIsRecipe } from "./validation"
 
+export const runtime = "nodejs"
+
 export async function POST(request: NextRequest) {
 	try {
 		// Rate limiting check with fallback on error
