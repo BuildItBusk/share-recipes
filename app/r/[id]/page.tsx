@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import { prisma } from "../../lib/db"
 import SharedRecipePage from "./SharedRecipePage"
+import RecipeSchema from "./RecipeSchema"
 
 interface PageProps {
 	params: Promise<{ id: string }>
@@ -26,7 +27,12 @@ export default async function RecipePage({ params }: PageProps) {
 		notFound()
 	}
 
-	return <SharedRecipePage recipe={recipe} />
+	return (
+		<>
+			<RecipeSchema recipe={recipe} />
+			<SharedRecipePage recipe={recipe} />
+		</>
+	)
 }
 
 export async function generateMetadata({ params }: PageProps) {
@@ -43,8 +49,29 @@ export async function generateMetadata({ params }: PageProps) {
 	const titleMatch = recipe.formattedText.match(/^#\s*(.+)$/m)
 	const title = titleMatch ? titleMatch[1] : "Shared Recipe"
 
+	// Extract first paragraph for description
+	const lines = recipe.formattedText.split("\n").filter((line) => line.trim())
+	const description =
+		lines
+			.find((line) => !line.startsWith("#") && line.length > 20)
+			?.substring(0, 160) || "A shared recipe formatted and ready to cook!"
+
+	const url = `https://paste-recipe.com/r/${id}`
+
 	return {
 		title: `${title} | Paste Recipe`,
-		description: "A shared recipe formatted and ready to cook!",
+		description,
+		openGraph: {
+			title,
+			description,
+			url,
+			type: "article",
+			siteName: "Paste Recipe",
+		},
+		twitter: {
+			card: "summary",
+			title,
+			description,
+		},
 	}
 }
