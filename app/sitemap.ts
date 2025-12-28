@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next"
 import { prisma } from "./lib/db"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-	const baseUrl = "https://paste-recipe.com"
+	const baseUrl = "https://www.pasterecipe.com"
 
 	// Get all recipes
 	const recipes = await prisma.recipe.findMany({

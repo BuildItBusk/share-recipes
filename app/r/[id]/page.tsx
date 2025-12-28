@@ -56,7 +56,7 @@ export async function generateMetadata({ params }: PageProps) {
 			.find((line) => !line.startsWith("#") && line.length > 20)
 			?.substring(0, 160) || "A shared recipe formatted and ready to cook!"
 
-	const url = `https://paste-recipe.com/r/${id}`
+	const url = `https://www.pasterecipe.com/r/${id}`
 
 	return {
 		title: `${title} | Paste Recipe`,
