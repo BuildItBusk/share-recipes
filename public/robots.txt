@@ -1,0 +1,11 @@
+# Allow all crawlers
+User-agent: *
+
+# Allow recipe pages
+Allow: /r/
+
+# Disallow API routes
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://paste-recipe.com/sitemap.xml
