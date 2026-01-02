@@ -31,6 +31,109 @@ export function isValidUrl(url: string): boolean {
 }
 
 /**
+ * Checks if a URL is allowed by the site's robots.txt
+ * Returns true if allowed, false if disallowed
+ */
+async function checkRobotsTxt(url: string): Promise<boolean> {
+	try {
+		const urlObj = new URL(url)
+		const robotsUrl = `${urlObj.protocol}//${urlObj.host}/robots.txt`
+
+		const controller = new AbortController()
+		const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout for robots.txt
+
+		const response = await fetch(robotsUrl, {
+			signal: controller.signal,
+			headers: {
+				"User-Agent": "PasteRecipe/1.0 (+https://www.pasterecipe.com; recipe formatter bot)",
+			},
+		})
+
+		clearTimeout(timeoutId)
+
+		// If robots.txt doesn't exist (404), assume allowed
+		if (response.status === 404) {
+			return true
+		}
+
+		if (!response.ok) {
+			// On other errors, be conservative and allow
+			return true
+		}
+
+		const robotsTxt = await response.text()
+		return isPathAllowed(robotsTxt, urlObj.pathname, "PasteRecipe")
+	} catch (error) {
+		// On network errors or timeouts, be conservative and allow
+		// (don't want to break functionality if robots.txt is unreachable)
+		console.warn("Failed to check robots.txt, allowing access:", error)
+		return true
+	}
+}
+
+/**
+ * Parses robots.txt and checks if a path is allowed for our user-agent
+ */
+function isPathAllowed(robotsTxt: string, path: string, userAgent: string): boolean {
+	const lines = robotsTxt.split("\n")
+	let relevantSection = false
+	let disallowedPaths: string[] = []
+	let allowedPaths: string[] = []
+
+	for (const line of lines) {
+		const trimmed = line.trim()
+
+		// Skip comments and empty lines
+		if (trimmed.startsWith("#") || trimmed === "") {
+			continue
+		}
+
+		// Check for User-agent directive
+		if (trimmed.toLowerCase().startsWith("user-agent:")) {
+			const agent = trimmed.substring(11).trim().toLowerCase()
+			// Match our bot name or wildcard *
+			relevantSection = agent === userAgent.toLowerCase() || agent === "*"
+			// Reset paths when entering new section
+			if (relevantSection) {
+				disallowedPaths = []
+				allowedPaths = []
+			}
+		}
+
+		// Collect Disallow/Allow rules if we're in a relevant section
+		if (relevantSection) {
+			if (trimmed.toLowerCase().startsWith("disallow:")) {
+				const disallowPath = trimmed.substring(9).trim()
+				if (disallowPath) {
+					disallowedPaths.push(disallowPath)
+				}
+			} else if (trimmed.toLowerCase().startsWith("allow:")) {
+				const allowPath = trimmed.substring(6).trim()
+				if (allowPath) {
+					allowedPaths.push(allowPath)
+				}
+			}
+		}
+	}
+
+	// Check if path matches any disallow rules
+	for (const disallowPath of disallowedPaths) {
+		if (path.startsWith(disallowPath)) {
+			// Check if there's a more specific allow rule
+			for (const allowPath of allowedPaths) {
+				if (path.startsWith(allowPath) && allowPath.length > disallowPath.length) {
+					return true
+				}
+			}
+			return false
+		}
+	}
+
+	// If no disallow rules matched, path is allowed
+	return true
+}
+
+/**
  * Fetches HTML from a given URL with timeout and size limits
  */
 export async function fetchUrlContent(url: string): Promise<FetchUrlResult> {
@@ -43,6 +146,16 @@ export async function fetchUrlContent(url: string): Promise<FetchUrlResult> {
 		}
 	}
 
+	// Check robots.txt before fetching
+	const robotsAllowed = await checkRobotsTxt(url)
+	if (!robotsAllowed) {
+		return {
+			html: "",
+			error: "This site's robots.txt disallows automated access. Please copy and paste the recipe text instead.",
+			status: 403,
+		}
+	}
+
 	try {
 		const controller = new AbortController()
 		const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
@@ -50,8 +163,7 @@ export async function fetchUrlContent(url: string): Promise<FetchUrlResult> {
 		const response = await fetch(url, {
 			signal: controller.signal,
 			headers: {
-				"User-Agent":
-					"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+				"User-Agent": "PasteRecipe/1.0 (+https://www.pasterecipe.com; recipe formatter bot)",
 			},
 		})
 

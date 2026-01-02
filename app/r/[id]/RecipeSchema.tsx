@@ -17,11 +17,15 @@ export default function RecipeSchema({ recipe }: { recipe: Recipe }) {
 
 	const schema = {
 		"@context": "https://schema.org",
-		"@type": "Recipe",
-		name,
+		"@type": "Article",
+		headline: name,
 		description,
 		datePublished: recipe.createdAt.toISOString(),
 		author: {
+			"@type": "Organization",
+			name: "Paste Recipe",
+		},
+		publisher: {
 			"@type": "Organization",
 			name: "Paste Recipe",
 		},
