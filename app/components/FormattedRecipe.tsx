@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { parseApiError } from "../lib/api-error"
 import MarkdownRenderer from "./MarkdownRenderer"
 import { useRecipe } from "./RecipeContext"
 
@@ -31,26 +32,17 @@ export default function FormattedRecipe() {
 			const data = await response.json()
 
 			if (!response.ok) {
-				// Handle validation errors with detailed issues
-				if (data.issues && data.issues.length > 0) {
-					const issueMessages = data.issues
-						.map((issue: { message: string }) => issue.message)
-						.join(", ")
-					throw new Error(`${data.error}: ${issueMessages}`)
-				}
-				throw new Error(data.error || "Failed to save recipe")
+				throw new Error(parseApiError(data, "Failed to save recipe"))
 			}
 
-			// Validate shareUrl before navigation
 			if (!data.shareUrl || typeof data.shareUrl !== "string") {
 				throw new Error("Invalid share URL received from server")
 			}
 
-			// Redirect to the shared recipe page
 			router.push(data.shareUrl)
-		} catch (error) {
-			console.error("Error saving recipe:", error)
-			setError(error instanceof Error ? error.message : "Failed to save recipe. Please try again.")
+		} catch (err) {
+			console.error("Error saving recipe:", err)
+			setError(err instanceof Error ? err.message : "Failed to save recipe. Please try again.")
 		} finally {
 			setIsSaving(false)
 		}

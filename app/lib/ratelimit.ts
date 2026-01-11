@@ -2,6 +2,13 @@ import { Ratelimit } from "@upstash/ratelimit"
 import { Redis } from "@upstash/redis"
 import { isRateLimitingAvailable } from "./env"
 
+export interface RateLimitResult {
+	success: boolean
+	limit: number
+	remaining: number
+	reset: number
+}
+
 // No-op rate limiter for when KV credentials are not available
 // Always allows requests (never rate limits)
 const noOpRatelimit = {
@@ -51,9 +58,27 @@ if (isRateLimitingAvailable()) {
 
 export { formatRecipeRatelimit, saveRecipeRatelimit }
 
-// Helper to get client IP from request
+/**
+ * Checks rate limit with fallback on Redis connection errors
+ * Returns a result that allows the request if rate limiting fails
+ */
+export async function checkRateLimit(
+	limiter: Ratelimit | typeof noOpRatelimit,
+	identifier: string,
+): Promise<RateLimitResult> {
+	try {
+		return await limiter.limit(identifier)
+	} catch (error) {
+		console.warn("Rate limiting check failed, allowing request:", error)
+		return { success: true, limit: 0, remaining: 0, reset: Date.now() }
+	}
+}
+
+/**
+ * Extracts client IP from request headers
+ * Checks Vercel's forwarded headers first, then falls back to x-real-ip
+ */
 export function getClientIp(request: Request): string {
-	// Check Vercel's forwarded IP headers first
 	const forwardedFor = request.headers.get("x-forwarded-for")
 	if (forwardedFor) {
 		return forwardedFor.split(",")[0].trim()
@@ -64,6 +89,5 @@ export function getClientIp(request: Request): string {
 		return realIp
 	}
 
-	// Fallback (shouldn't happen on Vercel)
 	return "unknown"
 }

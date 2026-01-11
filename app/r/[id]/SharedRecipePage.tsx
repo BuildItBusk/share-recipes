@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { useState, useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import MarkdownRenderer from "@/app/components/MarkdownRenderer"
 import { formatRecipeForObsidian } from "@/app/lib/markdown-export"
 

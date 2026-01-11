@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { prisma } from "../../lib/db"
-import { getClientIp, saveRecipeRatelimit } from "../../lib/ratelimit"
+import { checkRateLimit, getClientIp, saveRecipeRatelimit } from "../../lib/ratelimit"
 import { createShareUrl, generateUniqueRecipeId } from "../../lib/utils"
 import { SaveRecipeSchema } from "./validation"
 
@@ -8,17 +8,8 @@ export const runtime = "nodejs"
 
 export async function POST(request: NextRequest) {
 	try {
-		// Rate limiting check with fallback on error
 		const ip = getClientIp(request)
-		let rateLimitResult: { success: boolean; limit: number; remaining: number; reset: number }
-
-		try {
-			rateLimitResult = await saveRecipeRatelimit.limit(ip)
-		} catch (rateLimitError) {
-			// If rate limiting fails (e.g., Redis connection error), log and continue without rate limiting
-			console.warn("⚠️  Rate limiting check failed, allowing request:", rateLimitError)
-			rateLimitResult = { success: true, limit: 0, remaining: 0, reset: Date.now() }
-		}
+		const rateLimitResult = await checkRateLimit(saveRecipeRatelimit, ip)
 
 		if (!rateLimitResult.success) {
 			return NextResponse.json(

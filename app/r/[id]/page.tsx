@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation"
 import { prisma } from "../../lib/db"
-import SharedRecipePage from "./SharedRecipePage"
+import { extractRecipeTextMetadata } from "../../lib/recipe-metadata"
 import RecipeSchema from "./RecipeSchema"
+import SharedRecipePage from "./SharedRecipePage"
 
 interface PageProps {
 	params: Promise<{ id: string }>
@@ -45,17 +46,12 @@ export async function generateMetadata({ params }: PageProps) {
 		}
 	}
 
-	// Extract title from formatted text (look for first heading)
-	const titleMatch = recipe.formattedText.match(/^#\s*(.+)$/m)
-	const title = titleMatch ? titleMatch[1] : "Shared Recipe"
-
-	// Extract first paragraph for description
-	const lines = recipe.formattedText.split("\n").filter((line) => line.trim())
-	const description =
-		lines
-			.find((line) => !line.startsWith("#") && line.length > 20)
-			?.substring(0, 160) || "A shared recipe formatted and ready to cook!"
-
+	const { title, description: rawDescription } = extractRecipeTextMetadata(
+		recipe.formattedText,
+		"Shared Recipe",
+		"A shared recipe formatted and ready to cook!",
+	)
+	const description = rawDescription.substring(0, 160)
 	const url = `https://www.pasterecipe.com/r/${id}`
 
 	return {

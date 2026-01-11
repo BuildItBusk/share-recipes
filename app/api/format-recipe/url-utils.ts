@@ -151,7 +151,8 @@ export async function fetchUrlContent(url: string): Promise<FetchUrlResult> {
 	if (!robotsAllowed) {
 		return {
 			html: "",
-			error: "This site's robots.txt disallows automated access. Please copy and paste the recipe text instead.",
+			error:
+				"This site's robots.txt disallows automated access. Please copy and paste the recipe text instead.",
 			status: 403,
 		}
 	}
@@ -354,29 +355,26 @@ export function stripHtmlTags(html: string): string {
 	return text.trim()
 }
 
+const HTML_ENTITIES: Record<string, string> = {
+	"&amp;": "&",
+	"&lt;": "<",
+	"&gt;": ">",
+	"&quot;": '"',
+	"&#39;": "'",
+	"&nbsp;": " ",
+	"&mdash;": "\u2014",
+	"&ndash;": "\u2013",
+	"&ldquo;": "\u201C",
+	"&rdquo;": "\u201D",
+	"&lsquo;": "\u2018",
+	"&rsquo;": "\u2019",
+}
+
+const HTML_ENTITY_PATTERN = /&(?:amp|lt|gt|quot|nbsp|mdash|ndash|ldquo|rdquo|lsquo|rsquo|#39);/g
+
 /**
  * Decodes common HTML entities
  */
 function decodeHtmlEntities(text: string): string {
-	const entities: Record<string, string> = {
-		"&amp;": "&",
-		"&lt;": "<",
-		"&gt;": ">",
-		"&quot;": '"',
-		"&#39;": "'",
-		"&nbsp;": " ",
-		"&mdash;": "—",
-		"&ndash;": "–",
-		"&ldquo;": "\u201C",
-		"&rdquo;": "\u201D",
-		"&lsquo;": "\u2018",
-		"&rsquo;": "\u2019",
-	}
-
-	let result = text
-	for (const [entity, char] of Object.entries(entities)) {
-		result = result.replace(new RegExp(entity, "g"), char)
-	}
-
-	return result
+	return text.replace(HTML_ENTITY_PATTERN, (entity) => HTML_ENTITIES[entity] || entity)
 }

@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { formatRecipeRatelimit, getClientIp } from "../../lib/ratelimit"
+import { checkRateLimit, formatRecipeRatelimit, getClientIp } from "../../lib/ratelimit"
 import { formatRecipe } from "./formatting"
 import { extractMetadata, fetchUrlContent, type RecipeMetadata, stripHtmlTags } from "./url-utils"
 import { FormatRecipeSchema, validateIsRecipe } from "./validation"
@@ -8,17 +8,8 @@ export const runtime = "nodejs"
 
 export async function POST(request: NextRequest) {
 	try {
-		// Rate limiting check with fallback on error
 		const ip = getClientIp(request)
-		let rateLimitResult: { success: boolean; limit: number; remaining: number; reset: number }
-
-		try {
-			rateLimitResult = await formatRecipeRatelimit.limit(ip)
-		} catch (rateLimitError) {
-			// If rate limiting fails (e.g., Redis connection error), log and continue without rate limiting
-			console.warn("⚠️  Rate limiting check failed, allowing request:", rateLimitError)
-			rateLimitResult = { success: true, limit: 0, remaining: 0, reset: Date.now() }
-		}
+		const rateLimitResult = await checkRateLimit(formatRecipeRatelimit, ip)
 
 		if (!rateLimitResult.success) {
 			return NextResponse.json(

@@ -1,6 +1,7 @@
 "use client"
 
 import { useId, useState } from "react"
+import { parseApiError } from "../lib/api-error"
 import { useRecipe } from "./RecipeContext"
 
 export default function PasteRecipe() {
@@ -37,14 +38,7 @@ export default function PasteRecipe() {
 			const data = await response.json()
 
 			if (!response.ok) {
-				// Handle validation errors with detailed issues
-				if (data.issues && data.issues.length > 0) {
-					const issueMessages = data.issues
-						.map((issue: { message: string }) => issue.message)
-						.join(", ")
-					throw new Error(`${data.error}: ${issueMessages}`)
-				}
-				throw new Error(data.error || "Failed to format recipe")
+				throw new Error(parseApiError(data, "Failed to format recipe"))
 			}
 
 			setOriginalRecipe(recipeText)
